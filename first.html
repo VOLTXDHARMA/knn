@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  <title>anggun kinanti</title>
+  <meta name="theme-color" content="#ff8ac9"/>
+  <style>
+    :root{
+      --bg1:#ffe0f0;
+      --bg2:#e4f0ff;
+      --pink:#ff88c6;
+      --hot:#ff4aa8;
+      --vio:#8b7bff;
+      --ink:#2a2a2a;
+      --glass: rgba(255,255,255,.55);
+      --shadow: 0 10px 30px rgba(255, 60, 160, .25);
+      --radius: 24px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color:var(--ink);
+      background: radial-gradient(1200px 800px at 10% 10%, #ffeef7 0%, transparent 60%),
+                  radial-gradient(1000px 900px at 90% 0%, #e9f6ff 0%, transparent 60%),
+                  linear-gradient(135deg, var(--bg1), var(--bg2));
+      overflow-x:hidden;
+    }
+
+    /* Floating blobs for trendy look */
+    .blob{position:fixed; filter:blur(40px); opacity:.7; z-index:0;}
+    .blob.b1{top:-80px; left:-60px; width:240px; height:240px; background:#ffc1e3; border-radius:50% 40% 60% 50%/50% 60% 40% 50%; animation: drift 12s ease-in-out infinite}
+    .blob.b2{bottom:-120px; right:-80px; width:300px; height:300px; background:#c8d8ff; border-radius:40% 60% 50% 60%/60% 50% 60% 40%; animation: drift 16s ease-in-out infinite reverse}
+    @keyframes drift{0%,100%{transform:translate(0,0) rotate(0)} 50%{transform:translate(15px, -10px) rotate(8deg)}}
+
+    .wrap{
+      position:relative; z-index:2; min-height:100vh; display:grid; place-items:center; padding:24px; 
+    }
+
+    .card{
+      width:min(560px, 100%);
+      background: var(--glass);
+      -webkit-backdrop-filter: blur(14px);
+      backdrop-filter: blur(14px);
+      border:1px solid rgba(255,255,255,.5);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding:18px 18px 22px;
+    }
+
+    .topbar{display:flex; align-items:center; gap:12px; justify-content:space-between;}
+    .logo{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.2px}
+    .logo .dot{width:10px; height:10px; background:var(--hot); border-radius:50%; box-shadow:0 0 0 6px rgba(255,74,168,.15)}
+    .badge{font-size:12px; padding:6px 10px; border-radius:999px; background:#fff; border:1px dashed var(--pink)}
+
+    .hero{display:grid; place-items:center; text-align:center; padding:6px 8px 10px}
+    .photo{
+      width:min(200px, 48vw); aspect-ratio:1/1; border-radius:50%; overflow:hidden; position:relative; 
+      box-shadow: 0 10px 30px rgba(0,0,0,.08), 0 0 0 10px #fff7fb;
+      border: 2px solid #ffd5ea;
+      background:#fff;
+    }
+    .photo::after{
+      content:""; position:absolute; inset:-6px; border-radius:50%;
+      background: conic-gradient(from 0deg, #ffacd6, #c7bfff, #ffacd6);
+      -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 8px), #000 calc(100% - 8px));
+              mask: radial-gradient(farthest-side, transparent calc(100% - 8px), #000 calc(100% - 8px));
+      animation: spin 8s linear infinite;
+      opacity:.65;
+    }
+    @keyframes spin{to{transform:rotate(1turn)}}
+
+    h1{
+      margin:16px 0 6px; font-size: clamp(22px, 5vw, 30px); line-height:1.2
+    }
+    .tw{font-weight:800; background:linear-gradient(90deg,var(--hot),var(--vio)); -webkit-background-clip:text; background-clip:text; color:transparent}
+    .subtitle{opacity:.8; font-size:14px}
+
+    .controls{display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin:14px 0}
+    button, .file-btn{
+      border:none; outline:none; cursor:pointer; border-radius:999px; padding:12px 16px; font-weight:700; 
+      background:#fff; color:#333; box-shadow:0 8px 20px rgba(0,0,0,.06);
+      transition: transform .08s ease, box-shadow .2s ease; border:1px solid #ffe3f2;
+    }
+    button:hover, .file-btn:hover{transform:translateY(-1px)}
+    button:active, .file-btn:active{transform:translateY(1px)}
+    .primary{background: linear-gradient(90deg, #ffb3da, #b9b3ff); color:#2b1042}
+
+    .note{display:flex; align-items:center; gap:8px; font-size:12px; opacity:.85; justify-content:center}
+
+    .panel{margin-top:14px; padding:14px; background:#fff; border:1px solid #ffe1f0; border-radius:16px}
+    .panel h3{margin:0 0 8px; font-size:16px}
+
+    .heart-rain{position:fixed; inset:0; pointer-events:none; z-index:1}
+
+    /* Modal */
+    .modal{position:fixed; inset:0; display:none; place-items:center; background:rgba(0,0,0,.25); z-index:50; padding:20px}
+    .modal.open{display:grid}
+    .modal .box{width:min(520px, 100%); background:#fff; border-radius:20px; padding:18px; border:1px solid #ffd6ea; box-shadow:var(--shadow)}
+    .box h2{margin:0 0 8px}
+    .x{position:absolute; top:12px; right:12px; padding:8px 10px; border-radius:10px; border:1px solid #ffd6ea; background:#fff; cursor:pointer}
+
+    /* Small helper chips */
+    .chips{display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-top:8px}
+    .chip{font-size:12px; padding:6px 10px; background:#fff; border:1px solid #ffe3f2; border-radius:999px}
+
+    /* Responsive tweaks */
+    @media (max-width:420px){
+      .controls{gap:8px}
+      button, .file-btn{padding:11px 14px}
+    }
+  </style>
+</head>
+<body>
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+
+  <div class="wrap">
+    <div class="card" role="region" aria-label="Kartu pacar lucu">
+      <div class="topbar">
+        <div class="logo"><span class="dot"></span>dharmaa</div>
+        <div class="badge">anggun kinanti</div>
+      </div>
+
+      <section class="hero" aria-live="polite">
+        <div class="photo" aria-label="Foto pacar">
+          <!-- Ganti src di bawah dengan foto pacar Voltz -->
+          <img id="gfPhoto" src="https://images.unsplash.com/photo-1517935706615-2717063c2225?q=80&w=600&auto=format&fit=crop" alt="Foto kinan" style="width:100%; height:100%; object-fit:cover; border-radius:50%" />
+        </div>
+        <h1 class="tw"><span id="typewriter">Halo Kinan</span></h1>
+        <p class="subtitle"><strong>kinann ituu imutt</stron> seimutt suara kamu </p>
+
+        <div class="controls">
+          <button class="primary" id="btnMore">kata kata</button>
+          <button id="btnHug">hug virtual</button>
+          <button id="btnLetter">buka surat</button>
+          <label class="file-btn" for="fileInput">ganti foto </label>
+          <input id="fileInput" type="file" accept="image/*" hidden>
+        </div>
+
+        <div class="note">tip: kinan bisa <strong>ganti foto</strong>langusung dari hp </div>
+
+        <div class="chips" id="chips"></div>
+
+        <div class="panel" id="panel" hidden>
+          <h3>kenapa kinan sangat lucukk</h3>
+          <ul id="reasons" style="margin:6px 0 0; padding-left:18px; line-height:1.65"></ul>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div class="heart-rain" id="heartRain" aria-hidden="true"></div>
+
+  <!-- Modal Surat -->
+  <div class="modal" id="modal">
+    <div class="box">
+      <button class="x" id="closeModal" aria-label="Tutup">✕</button>
+      <h2>untuk kamu, anggun kinanti</h2>
+      <p style="line-height:1.7; margin-top:8px">
+        SEMANGATT YAA KERJANYAAAA
+      </p>
+      <div class="chips">
+        <span class="chip">ANGGUN</span>
+        <span class="chip">KINANTI</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== Typewriter (tanpa library) =====
+    const phrases = [
+      "haloo kinann",
+      "kinann yang imutt nann lucukk",
+      "semanggatt yaa kerjanyyaa",
+    ];
+    let pi = 0, ci = 0, deleting = false;
+    const tw = document.getElementById('typewriter');
+    function type(){
+      const full = phrases[pi % phrases.length];
+      if(!deleting){
+        ci++;
+        tw.textContent = full.slice(0, ci);
+        if(ci === full.length){
+          deleting = true; setTimeout(type, 1100); return;
+        }
+      } else {
+        ci--; tw.textContent = full.slice(0, ci);
+        if(ci === 0){ deleting = false; pi++; }
+      }
+      const speed = deleting ? 28 : 55; // natural typing
+      setTimeout(type, speed + Math.random()*50);
+    }
+    type();
+
+    // ===== Heart Rain =====
+    const heartRain = document.getElementById('heartRain');
+    function dropHeart(){
+      const h = document.createElement('span');
+      const size = 10 + Math.random()*18;
+      h.textContent = '❤';
+      h.style.position='absolute';
+      h.style.left = Math.random()*100 + 'vw';
+      h.style.fontSize = size + 'px';
+      h.style.opacity = .75;
+      h.style.filter = 'drop-shadow(0 6px 8px rgba(255,0,120,.25))';
+      const duration = 4500 + Math.random()*3000;
+      const start = Date.now();
+      const drift = (Math.random()-.5) * 80;
+      function anim(){
+        const t = (Date.now()-start)/duration;
+        if(t>=1){ h.remove(); return; }
+        const y = t * window.innerHeight + (Math.sin(t*6)*10);
+        h.style.transform = `translate(${drift*t}px, ${y}px) rotate(${t*360}deg)`;
+        requestAnimationFrame(anim);
+      }
+      heartRain.appendChild(h); anim();
+    }
+    setInterval(dropHeart, 240);
+    for(let i=0;i<12;i++) setTimeout(dropHeart, i*120);
+
+    // ===== Compliments & Reasons =====
+    const compliments = [
+      "inii kosongg duluu ya karnaa mepett",
+    ];
+
+    const chips = document.getElementById('chips');
+    const reasonsList = document.getElementById('reasons');
+    const panel = document.getElementById('panel');
+
+    function addCompliment(){
+      const text = compliments[Math.floor(Math.random()*compliments.length)];
+      const chip = document.createElement('span');
+      chip.className='chip'; chip.textContent = text; chips.prepend(chip);
+      // Show reasons panel softly
+      if(panel.hidden){ panel.hidden = false; }
+      const li = document.createElement('li'); li.textContent = text; reasonsList.prepend(li);
+      if(chips.children.length > 10){ chips.lastElementChild.remove(); }
+      if(reasonsList.children.length > 12){ reasonsList.lastElementChild.remove(); }
+    }
+
+    document.getElementById('btnMore').addEventListener('click', addCompliment);
+
+    // Add a few on load for cuteness
+    for(let i=0;i<3;i++){ setTimeout(addCompliment, 400 + i*250); }
+
+    // ===== Virtual Hug =====
+    document.getElementById('btnHug').addEventListener('click', () => {
+      const card = document.querySelector('.card');
+      card.animate([
+        { transform:'scale(1)' },
+        { transform:'scale(1.02)' },
+        { transform:'scale(0.98)' },
+        { transform:'scale(1.015)' },
+        { transform:'scale(1)' }
+      ], { duration: 520, easing: 'ease-in-out' });
+      // burst of hearts
+      for(let i=0;i<10;i++) setTimeout(dropHeart, i*40);
+    });
+
+    // ===== Love Letter Modal =====
+    const modal = document.getElementById('modal');
+    document.getElementById('btnLetter').addEventListener('click', ()=>{
+      modal.classList.add('open');
+    });
+    document.getElementById('closeModal').addEventListener('click', ()=>{
+      modal.classList.remove('open');
+    });
+    modal.addEventListener('click', (e)=>{ if(e.target===modal) modal.classList.remove('open'); });
+
+    // ===== Replace Photo from phone gallery =====
+    const fileInput = document.getElementById('fileInput');
+    const gfPhoto = document.getElementById('gfPhoto');
+    fileInput.addEventListener('change', (e)=>{
+      const file = e.target.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev)=>{ gfPhoto.src = ev.target.result; };
+      reader.readAsDataURL(file);
+    });
+
+    // ===== Minor perf: pause heart rain offscreen =====
+    let hidden = false;
+    document.addEventListener('visibilitychange', ()=>{ hidden = document.hidden; });
+    const oldSetInterval = setInterval;
+    // not overriding, just demonstrate awareness (no heavy timers added)
+  </script>
+</body>
+</html>
